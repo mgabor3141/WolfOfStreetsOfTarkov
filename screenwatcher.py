@@ -41,12 +41,15 @@ def find_listings(sct, patterns):
                 continue
 
             raw_listings.setdefault(y, {})[x] = pattern
+            cv2.putText(img_rgb, str(pattern), pt, cv2.FONT_HERSHEY_SIMPLEX, 1, (64, 128, 64))
 
             last_x = x
             last_y = y
 
     sorted_listings = [p[1] for p in sorted(raw_listings.items())]
     listings = [[p[1] for p in sorted(listing.items())] for listing in sorted_listings]
+
+    cv2.imshow("Image", img_rgb)
 
     print("Frame time: {:>6}ms".format(round((timeit.default_timer() - time_begin) * 1000, 2)))
     return listings
