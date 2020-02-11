@@ -1,46 +1,32 @@
 import sys
-import time
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 from PySide2.QtCore import *
-
 
 from screenwatcher import ScreenWatcher
 
 
 class QCustomMainWindow(QMainWindow):
     def __init__(self):
-        super(QCustomMainWindow, self).__init__()
-        # Create action with QPushButton
-        self.startQPushButton = QPushButton('START')
-        self.startQPushButton.released.connect(self.startWork)
-        self.setCentralWidget(self.startQPushButton)
-        # Create QProgressDialog
-        self.loadingQProgressDialog = QProgressDialog(self)
-        self.loadingQProgressDialog.setLabelText('Loading')
-        self.loadingQProgressDialog.setCancelButtonText('Cancel')
-        self.loadingQProgressDialog.setWindowModality(Qt.WindowModal)
+        super(QCustomMainWindow, self).__init__(None, Qt.WindowStaysOnTopHint)
 
-    def startWork(self):
-        myQCustomThread = ScreenWatcher(self)
+        self.setWindowTitle('WolfOfStreetsOfTarkov')
+        self.text = QLabel("")
+        self.setCentralWidget(self.text)
+        self.screen_watcher = ScreenWatcher(self)
 
-        def startLoadCallBack(numberOfprogress):
-            self.loadingQProgressDialog.setMinimum(0)
-            self.loadingQProgressDialog.setMaximum(numberOfprogress)
-            self.loadingQProgressDialog.show()
+        def data_cb(progress):
+            self.text.setText(progress)
 
-        def progressLoadCallBack(progress):
-            self.loadingQProgressDialog.setValue(progress)
+        self.screen_watcher.progressLoad.connect(data_cb)
 
-        def statusLoadCallBack(flag):
-            print
-            'SUCCESSFUL' if flag else 'FAILED'
+        self.screen_watcher.start()
 
-        myQCustomThread.startLoad.connect(startLoadCallBack)
-        myQCustomThread.progressLoad.connect(progressLoadCallBack)
-        myQCustomThread.statusLoad.connect(statusLoadCallBack)
-        self.loadingQProgressDialog.canceled.connect(myQCustomThread.cancel)
-        myQCustomThread.start()
+    # def closeEvent(self, event):
+    #     self.screen_watcher.cancel()
+        # self.worker.signals.quit.emit()
+        # self.worker.quit()
+        # self.threadpool.waitForDone()
 
 
 myQApplication = QApplication(sys.argv)
