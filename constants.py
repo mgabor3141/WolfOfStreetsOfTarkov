@@ -16,8 +16,10 @@ MATCH_THRESHOLDS = {
     'usd': 0.85,
     'eur': 0.85,
     # 'peritem': 0.9,
-    'perpack': 0.85
+    'perpack': 0.85,
+    'locked': 0.85
 }
-PRICE_REGION = {'top': 150, 'left': 1250, 'width': 200, 'height': 830}
+PRICE_REGION = {'top': 150, 'left': 1250, 'width': 200, 'height': 900}
+LOCKED_REGION = {'top': 150, 'left': 1701, 'width': 114, 'height': 900}
 PURCHASE_OFFSET = 1700, 160
 

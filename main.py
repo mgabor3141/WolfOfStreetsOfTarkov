@@ -29,7 +29,7 @@ class QCustomMainWindow(QMainWindow):
 
         def data_cb(listings):
             self.text.setText('\n'.join([str(l) for l in listings]))
-        self.screen_watcher.progressLoad.connect(data_cb)
+        self.screen_watcher.listings_signal.connect(data_cb)
 
         self.screen_watcher.start()
 
