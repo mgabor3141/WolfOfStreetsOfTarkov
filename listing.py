@@ -11,7 +11,7 @@ class Listing:
         self.valid = True
 
         self.perpack = "perpack" in params
-        self.locked = "locked" in params
+        self.purchasable = "purchase" in params
 
         self.currency = None
         for c in {"rub", "eur", "usd"}:
@@ -31,7 +31,7 @@ class Listing:
             if last_x is not None and last_x - x > MAX_GAP_BETWEEN_NUMBERS:
                 self.valid = False
                 self.value = None
-                print("Gap too large: {}".format(last_x - x))
+                # print("Gap too large: {}".format(last_x - x))
                 break
 
             self.value += v * 10 ** i
@@ -41,7 +41,7 @@ class Listing:
             self.valid = False
 
     def rub_value(self):
-        if not self.valid or self.locked:
+        if not self.valid or not self.purchasable:
             return None
 
         val = self.value
@@ -51,16 +51,23 @@ class Listing:
             val *= 119
 
         if self.perpack:
-            val /= 2
+            if val % 2 == 0:
+                val //= 2
+            elif val % 3 == 0:
+                val //= 3
+            elif val % 5 == 0:
+                val //= 5
+            else:
+                val /= 7
 
         return val
 
     def __repr__(self):
         if not self.valid:
             return '-'
-        return "{:7d} {}{}{}".format(
+        return "{:d} {}{}{}".format(
             self.value,
             self.currency,
             ' p' if self.perpack else '',
-            ' L' if self.locked else ''
+            ' X' if not self.purchasable else ''
         )

@@ -17,14 +17,14 @@ def find_listings(sct, patterns):
     img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_BGR2GRAY)
 
     img_price = img_gray[:, :200]
-    img_locked = img_gray[:, -129:]
+    img_purchase = img_gray[:, -129:]
 
     raw_listings = {}
     line_offset = None
 
     for pattern in patterns:
-        if pattern == 'locked':
-            img = img_locked
+        if pattern == 'purchase':
+            img = img_purchase
         else:
             img = img_price
 
@@ -45,11 +45,10 @@ def find_listings(sct, patterns):
 
     listings = {y: Listing(y * LINE_HEIGHT + line_offset, l) for y, l in sorted(raw_listings.items())}
 
-    # cv2.imshow("Image", img_locked)
+    # cv2.imshow("Image", img_price)
     # cv2.waitKey(1)
 
-    print("Frame time: {:6.2f}ms".format((timeit.default_timer() - time_begin) * 1000))
-    return listings.values()
+    return listings.values(), (timeit.default_timer() - time_begin) * 1000
 
 
 class ScreenWatcher(QThread):
@@ -63,7 +62,7 @@ class ScreenWatcher(QThread):
         for i in range(0, 10):
             self.patterns[i] = cv2.imread(r'patterns/{}.png'.format(i), 0)
 
-        for c in {'rub', 'eur', 'usd', 'perpack', 'locked'}:
+        for c in {'rub', 'eur', 'usd', 'perpack', 'purchase'}:
             self.patterns[c] = cv2.imread(r'patterns/{}.png'.format(c), 0)
 
     def run(self):
