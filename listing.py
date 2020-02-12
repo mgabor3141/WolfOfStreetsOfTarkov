@@ -10,11 +10,8 @@ class Listing:
 
         self.valid = True
 
-        # self.peritem = "peritem" in params
         self.perpack = "perpack" in params
-
-        # if self.perpack == self.peritem:
-        #     self.valid = False
+        self.locked = "locked" in params
 
         self.currency = None
         for c in {"rub", "eur", "usd"}:
@@ -42,11 +39,6 @@ class Listing:
 
         if self.value == 0:
             self.valid = False
-
-        self.locked = False
-
-    def lock(self):
-        self.locked = True
 
     def __repr__(self):
         if not self.valid:

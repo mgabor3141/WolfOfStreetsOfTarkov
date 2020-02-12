@@ -19,7 +19,4 @@ MATCH_THRESHOLDS = {
     'perpack': 0.85,
     'locked': 0.85
 }
-PRICE_REGION = {'top': 150, 'left': 1250, 'width': 200, 'height': 900}
-LOCKED_REGION = {'top': 150, 'left': 1701, 'width': 114, 'height': 900}
-PURCHASE_OFFSET = 1700, 160
-
+SCREEN_REGION = {'top': 145, 'left': 1250, 'width': 580, 'height': LINE_HEIGHT * 6}
