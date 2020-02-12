@@ -28,7 +28,7 @@ class QCustomMainWindow(QMainWindow):
         self.screen_watcher = ScreenWatcher(self)
 
         def data_cb(listings):
-            self.text.setText('\n'.join([str(l) for l in listings]))
+            self.text.setText('\n'.join(["{} ({})".format(str(l), l.rub_value()) for l in listings]))
         self.screen_watcher.listings_signal.connect(data_cb)
 
         self.screen_watcher.start()

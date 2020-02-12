@@ -40,6 +40,21 @@ class Listing:
         if self.value == 0:
             self.valid = False
 
+    def rub_value(self):
+        if not self.valid or self.locked:
+            return None
+
+        val = self.value
+        if self.currency == 'usd':
+            val *= 109  # 57 as far as sorting is concerned
+        elif self.currency == 'eur':
+            val *= 119
+
+        if self.perpack:
+            val /= 2
+
+        return val
+
     def __repr__(self):
         if not self.valid:
             return '-'
