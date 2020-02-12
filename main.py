@@ -1,3 +1,4 @@
+import random
 import sys
 import timeit
 
@@ -9,6 +10,7 @@ from pyqtkeybind import keybinder
 from ctypes import windll, create_unicode_buffer
 
 from buyer import buy
+from constants import *
 from screenwatcher import ScreenWatcher
 
 
@@ -18,11 +20,16 @@ def get_foreground_window_title():
     buf = create_unicode_buffer(length + 1)
     windll.user32.GetWindowTextW(hWnd, buf, length + 1)
 
-    # 1-liner alternative: return buf.value if buf.value else None
-    if buf.value:
-        return buf.value
-    else:
-        return None
+    return buf.value if buf.value else None
+
+
+def refresh():
+    if get_foreground_window_title() == "EscapeFromTarkov":
+        pyautogui.press('f5')
+
+
+def refresh_interval():
+    return 3.1 + random.random()
 
 
 class QCustomMainWindow(QMainWindow):
@@ -30,12 +37,10 @@ class QCustomMainWindow(QMainWindow):
         super(QCustomMainWindow, self).__init__(*args)
         self.last_time = timeit.default_timer()
 
-        self.buying = False
-
         self.setWindowTitle('WolfOfStreetsOfTarkov')
         self.setGeometry(100, 700, 370, 200)
 
-        self.buy_button = QPushButton("Dubaj (Ctrl + Alt + B)")
+        self.buy_button = QPushButton("")
         self.buy_button.clicked.connect(self.toggle_buying)
 
         self.text = QLabel("")
@@ -54,7 +59,16 @@ class QCustomMainWindow(QMainWindow):
 
         self.screen_watcher = ScreenWatcher(self)
 
+        self.buying = False
+        self.update_buy_state()
+
+        self.buying_until = 0
+        self.refresh_interval = refresh_interval()
+
         def data_cb(data):
+            if timeit.default_timer() < self.buying_until:
+                return
+
             listings, frametime = data
 
             self.frametime.setText("Frame time: {:6.2f}ms".format(frametime))
@@ -64,24 +78,29 @@ class QCustomMainWindow(QMainWindow):
                            for l in listings]))
 
             if self.buying and self.target_price.text().isdigit() and get_foreground_window_title() == "EscapeFromTarkov":
-                buy(listings, int(self.target_price.text()))
+                self.buying_until = timeit.default_timer() + CLICK_TIME * 4 * buy(listings, int(self.target_price.text()))
 
-            if timeit.default_timer() - self.last_time >= 3.2:
+            if self.buying and timeit.default_timer() - self.last_time >= self.refresh_interval:
                 refresh()
                 self.last_time = timeit.default_timer()
+                self.refresh_interval = refresh_interval()
 
         self.screen_watcher.listings_signal.connect(data_cb)
 
-        def refresh():
-            if get_foreground_window_title() == "EscapeFromTarkov":
-                pyautogui.press('f5')
-
         self.screen_watcher.start()
+
+    def update_buy_state(self):
+        if self.buying:
+            print("Buying")
+            self.buy_button.setText("Du not baj (Ctrl + Alt + B)")
+            refresh()
+        else:
+            print("No longer buying")
+            self.buy_button.setText("Dubaj (Ctrl + Alt + B)")
 
     def toggle_buying(self):
         self.buying = not self.buying
-        print("Buying" if self.buying else "No longer buying")
-        self.buy_button.setText("Dubaj (Ctrl + Alt + B)" if not self.buying else "Du not baj (Ctrl + Alt + B)")
+        self.update_buy_state()
 
 
 class WinEventFilter(QAbstractNativeEventFilter):

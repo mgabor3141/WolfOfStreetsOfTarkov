@@ -19,7 +19,8 @@ MATCH_THRESHOLDS = {
     'perpack': 0.85,
     'purchase': 0.85
 }
-SCREEN_REGION = {'top': 145, 'left': 1250, 'width': 570, 'height': LINE_HEIGHT * 4}
+SCREEN_REGION = {'top': 145, 'left': 1250, 'width': 570, 'height': LINE_HEIGHT * 5}
 PURCHASE_OFFSET = 1730, 185
 ALL_BUTTON = 1180, 483
 OK_BUTTON = 963, 578
+CLICK_TIME = 0.15
