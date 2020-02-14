@@ -78,7 +78,7 @@ class QCustomMainWindow(QMainWindow):
                            for l in listings]))
 
             if self.buying and self.target_price.text().isdigit() and get_foreground_window_title() == "EscapeFromTarkov":
-                self.buying_until = timeit.default_timer() + CLICK_TIME * 4 * buy(listings, int(self.target_price.text()))
+                self.buying_until = timeit.default_timer() + CLICK_TIME * 5 * buy(listings, int(self.target_price.text()))
 
             if self.buying and timeit.default_timer() - self.last_time >= self.refresh_interval:
                 refresh()

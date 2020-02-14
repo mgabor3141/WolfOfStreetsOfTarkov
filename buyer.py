@@ -10,14 +10,16 @@ def buy(listings, target_value, currencies=None):
     if currencies is None:
         currencies = {'rub'}
 
-    items_to_buy = 0
+    # items_to_buy = 0
 
     for l in listings:
         if l.rub_value() is not None and l.rub_value() <= target_value and l.currency in currencies:
-            items_to_buy += 1
+            # items_to_buy += 1
             buy_listing(l)
+            return 1
 
-    return items_to_buy
+    return 0
+    # return items_to_buy
 
 
 def buy_listing(listing: Listing):
