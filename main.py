@@ -1,17 +1,14 @@
 import random
 import sys
-import timeit
-
-import pyautogui
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-from PySide2.QtCore import *
-from pyqtkeybind import keybinder
 from ctypes import windll, create_unicode_buffer
 
-from buyer import buy
-from constants import *
-from screenwatcher import ScreenWatcher
+import pyautogui
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
+from pyqtkeybind import keybinder
+
+from marketbot import MarketBot
 
 
 def get_foreground_window_title():
@@ -32,11 +29,12 @@ def refresh_interval():
     return 3.1 + random.random()
 
 
-class QCustomMainWindow(QMainWindow):
-    def __init__(self, *args):
-        super(QCustomMainWindow, self).__init__(*args)
-        self.last_time = timeit.default_timer()
+class MarketBotMainWindow(QMainWindow):
+    buying_signal = Signal(bool)
 
+    def __init__(self, *args):
+        super(MarketBotMainWindow, self).__init__(*args)
+        # self.last_time = timeit.default_timer()
         self.setWindowTitle('WolfOfStreetsOfTarkov')
         self.setGeometry(100, 700, 370, 200)
 
@@ -44,58 +42,53 @@ class QCustomMainWindow(QMainWindow):
         self.buy_button.clicked.connect(self.toggle_buying)
 
         self.text = QLabel("")
-        self.frametime = QLabel("")
+        self.successful_buys_text = QLabel("")
         self.target_price = QLineEdit(self)
 
-        self.lo = QVBoxLayout()
-        self.lo.addWidget(self.buy_button)
-        self.lo.addWidget(self.target_price)
-        self.lo.addWidget(self.text)
-        self.lo.addWidget(self.frametime)
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(self.buy_button)
+        main_layout.addWidget(self.target_price)
+        main_layout.addWidget(self.text)
+        main_layout.addWidget(self.successful_buys_text)
 
-        self.widget = QWidget()
-        self.widget.setLayout(self.lo)
-        self.setCentralWidget(self.widget)
+        wrapper_widget = QWidget()
+        wrapper_widget.setLayout(main_layout)
+        self.setCentralWidget(wrapper_widget)
 
-        self.screen_watcher = ScreenWatcher(self)
+        self.marketbot = MarketBot(self)
+        self.buying_signal.connect(self.marketbot.buying_changed)
+        self.target_price.textChanged.connect(self.marketbot.price_changed)
 
         self.buying = False
         self.update_buy_state()
+        self.target_price.setText("14000")
 
-        self.buying_until = 0
-        self.refresh_interval = refresh_interval()
-
-        def data_cb(data):
-            if timeit.default_timer() < self.buying_until:
-                return
-
-            listings, frametime = data
-
-            self.frametime.setText("Frame time: {:6.2f}ms".format(frametime))
-
+        def listing_cb(listings):
             self.text.setText(
                 '\n'.join(["{} ({:.0f})".format(str(l), l.rub_value() if l.rub_value() is not None else -1)
                            for l in listings]))
 
-            if self.buying and self.target_price.text().isdigit() and get_foreground_window_title() == "EscapeFromTarkov":
-                self.buying_until = timeit.default_timer() + CLICK_TIME * 5 * buy(listings, int(self.target_price.text()))
+        self.marketbot.listings_signal.connect(listing_cb)
 
-            if self.buying and timeit.default_timer() - self.last_time >= self.refresh_interval:
-                refresh()
-                self.last_time = timeit.default_timer()
-                self.refresh_interval = refresh_interval()
+        self.successful_buys = []
 
-        self.screen_watcher.listings_signal.connect(data_cb)
+        def buy_cb(listing):
+            self.successful_buys.append(listing)
+            numbuys = len(self.successful_buys)
+            self.successful_buys_text.setText(
+                "Bought {} for {:.1f} rub avg".format(
+                    numbuys, sum([l.rub_value() for l in self.successful_buys]) / numbuys))
 
-        self.screen_watcher.start()
+        self.marketbot.successful_buy_signal.connect(buy_cb)
+        self.marketbot.start()
 
     def update_buy_state(self):
+        self.buying_signal.emit(self.buying)
         if self.buying:
-            print("Buying")
+            print("Buying active")
             self.buy_button.setText("Du not baj (Ctrl + Alt + B)")
-            refresh()
         else:
-            print("No longer buying")
+            print("Buying not active")
             self.buy_button.setText("Dubaj (Ctrl + Alt + B)")
 
     def toggle_buying(self):
@@ -115,7 +108,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
 
 def main():
     app = QApplication(sys.argv)
-    win = QCustomMainWindow(None, Qt.WindowStaysOnTopHint)
+    win = MarketBotMainWindow(None, Qt.WindowStaysOnTopHint)
 
     keybinder.init()
     keybinder.register_hotkey(win.winId(), "Ctrl+Alt+B", win.toggle_buying)

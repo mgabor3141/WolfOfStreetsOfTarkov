@@ -1,4 +1,4 @@
-from constants import *
+MAX_GAP_BETWEEN_NUMBERS = 25
 
 
 class Listing:
@@ -11,7 +11,7 @@ class Listing:
         self.valid = True
 
         self.perpack = "perpack" in params
-        self.purchasable = "purchase" in params
+        # self.purchasable = "purchase" in params
 
         self.currency = None
         for c in {"rub", "eur", "usd"}:
@@ -31,7 +31,7 @@ class Listing:
             if last_x is not None and last_x - x > MAX_GAP_BETWEEN_NUMBERS:
                 self.valid = False
                 self.value = None
-                # print("Gap too large: {}".format(last_x - x))
+                print("Gap too large: {}".format(last_x - x))
                 break
 
             self.value += v * 10 ** i
@@ -41,7 +41,7 @@ class Listing:
             self.valid = False
 
     def rub_value(self):
-        if not self.valid or not self.purchasable:
+        if not self.valid:
             return None
 
         val = self.value
@@ -65,9 +65,8 @@ class Listing:
     def __repr__(self):
         if not self.valid:
             return '-'
-        return "{:d} {}{}{}".format(
+        return "{:d} {}{}".format(
             self.value,
             self.currency,
-            ' p' if self.perpack else '',
-            ' X' if not self.purchasable else ''
+            ' p' if self.perpack else ''
         )
