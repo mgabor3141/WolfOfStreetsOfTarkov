@@ -13,6 +13,7 @@ from constants import LINE_HEIGHT
 from screenwatcher import ScreenWatcher
 
 pyautogui.PAUSE = 0.1
+pyautogui.FAILSAFE = False
 
 PURCHASE_OFFSET = 1730, 185
 
@@ -59,6 +60,7 @@ class MarketBot(QThread):
 
             while True:
                 if not self.buying or not get_foreground_window_title() == "EscapeFromTarkov":
+                    self.state = State.WAIT_FOR_REFRESH
                     sleep(0.5)
                     continue
 
@@ -67,13 +69,18 @@ class MarketBot(QThread):
                         self.refresh()
                         sleep(0.08)
                         self.next_refresh = default_timer() + self.refresh_interval()
+                        self.unavailable_listings = set()
                         self.state = State.WAIT_FOR_LISTINGS
+
+                elif self.next_refresh + 10 < default_timer():
+                    print("Stuck failsafe triggered")
+                    self.state = State.WAIT_FOR_REFRESH
 
                 elif self.state is State.WAIT_FOR_LISTINGS:
                     self.listings = self.screenwatcher.find_listings()
                     if self.listings:
+                        print(self.listings)
                         self.listings_signal.emit(self.listings)
-                        self.unavailable_listings = set()
                         self.state = State.WAIT_FOR_BUY_BUTTON
 
                 elif self.state is State.WAIT_FOR_BUY_BUTTON:
@@ -94,19 +101,14 @@ class MarketBot(QThread):
                         sleep(0.1)
                         error = self.screenwatcher.find_error_ok_button()
                         if error:
-                            print("\tPurchase unsuccessful")
+                            print("\tFAIL")
                             self.unavailable_listings.add(self.last_buy_number)
                             pyautogui.click(error)
+                            self.state = State.WAIT_FOR_BUY_BUTTON
                         else:
-                            print("\tPurchase successful")
+                            print("\tSUCCESS")
                             self.successful_buy_signal.emit(self.listings[self.last_buy_number])
-                            new_listings = []
-                            for i in range(0, len(self.listings)):
-                                if i != self.last_buy_number:
-                                    self.listings[i].coord -= LINE_HEIGHT
-                                    new_listings.append(self.listings[i])
-                            self.listings = new_listings
-                        self.state = State.WAIT_FOR_BUY_BUTTON
+                            self.state = State.WAIT_FOR_LISTINGS
 
     def refresh(self):
         # Todo: right click filter by item

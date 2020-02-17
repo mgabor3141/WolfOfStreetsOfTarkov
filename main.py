@@ -36,7 +36,7 @@ class MarketBotMainWindow(QMainWindow):
         super(MarketBotMainWindow, self).__init__(*args)
         # self.last_time = timeit.default_timer()
         self.setWindowTitle('WolfOfStreetsOfTarkov')
-        self.setGeometry(100, 700, 370, 200)
+        self.setGeometry(1910, 700, 370, 200)
 
         self.buy_button = QPushButton("")
         self.buy_button.clicked.connect(self.toggle_buying)
@@ -61,7 +61,7 @@ class MarketBotMainWindow(QMainWindow):
 
         self.buying = False
         self.update_buy_state()
-        self.target_price.setText("14000")
+        self.target_price.setText("12000")
 
         def listing_cb(listings):
             self.text.setText(
