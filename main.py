@@ -5,6 +5,7 @@ from ctypes import windll, create_unicode_buffer
 import pyautogui
 from PySide2.QtCore import *
 from PySide2.QtGui import *
+from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import *
 from pyqtkeybind import keybinder
 
@@ -34,39 +35,35 @@ class MarketBotMainWindow(QMainWindow):
 
     def __init__(self, *args):
         super(MarketBotMainWindow, self).__init__(*args)
-        # self.last_time = timeit.default_timer()
         self.setWindowTitle('WolfOfStreetsOfTarkov')
-        self.setGeometry(1910, 700, 370, 200)
+        self.setGeometry(100, 750, 290, 170)
 
-        self.buy_button = QPushButton("")
-        self.buy_button.clicked.connect(self.toggle_buying)
+        file = QFile("main.ui")
+        file.open(QFile.ReadOnly)
+        self.main = QUiLoader().load(file, self)
+        file.close()
 
-        self.text = QLabel("")
-        self.successful_buys_text = QLabel("")
-        self.target_price = QLineEdit(self)
-
-        main_layout = QVBoxLayout()
-        main_layout.addWidget(self.buy_button)
-        main_layout.addWidget(self.target_price)
-        main_layout.addWidget(self.text)
-        main_layout.addWidget(self.successful_buys_text)
-
-        wrapper_widget = QWidget()
-        wrapper_widget.setLayout(main_layout)
-        self.setCentralWidget(wrapper_widget)
+        self.setCentralWidget(self.main)
 
         self.marketbot = MarketBot(self)
         self.buying_signal.connect(self.marketbot.buying_changed)
-        self.target_price.textChanged.connect(self.marketbot.price_changed)
+        self.main.target_price.valueChanged.connect(self.marketbot.price_changed)
 
         self.buying = False
         self.update_buy_state()
-        self.target_price.setText("12000")
 
         def listing_cb(listings):
-            self.text.setText(
-                '\n'.join(["{} ({:.0f})".format(str(l), l.rub_value() if l.rub_value() is not None else -1)
-                           for l in listings]))
+            limit = self.main.buy_limit.getValue() - 1
+            if limit == 0:
+                self.buying = False
+                self.update_buy_state()
+            self.main.buy_limit.setValue(limit)
+
+            # TODO graph this
+            pass
+            # self.text.setText(
+            #     '\n'.join(["{} ({:.0f})".format(str(l), l.rub_value() if l.rub_value() is not None else -1)
+            #                for l in listings]))
 
         self.marketbot.listings_signal.connect(listing_cb)
 
@@ -74,12 +71,15 @@ class MarketBotMainWindow(QMainWindow):
 
         def buy_cb(listing):
             self.successful_buys.append(listing)
-            numbuys = len(self.successful_buys)
-            self.successful_buys_text.setText(
-                "Bought {} for {:.1f} rub avg".format(
-                    numbuys, sum([l.rub_value() for l in self.successful_buys]) / numbuys))
-
+            num_buys = len(self.successful_buys)
+            self.main.total_label.setText("Bought: {}".format(num_buys))
+            self.main.avg_label.setText("Average Price: {:.1f}".format(sum([l.rub_value() for l in self.successful_buys]) / num_buys))
         self.marketbot.successful_buy_signal.connect(buy_cb)
+
+        def reset_buys():
+            self.successful_buys = []
+        self.main.reset_stats.clicked.connect(reset_buys)
+
         self.marketbot.start()
 
     def update_buy_state(self):
@@ -89,7 +89,7 @@ class MarketBotMainWindow(QMainWindow):
             self.buy_button.setText("Du not baj (Ctrl + Alt + B)")
         else:
             print("Buying not active")
-            self.buy_button.setText("Dubaj (Ctrl + Alt + B)")
+            self.main.buy_button.setText("Dubaj (Ctrl + Alt + B)")
 
     def toggle_buying(self):
         self.buying = not self.buying
