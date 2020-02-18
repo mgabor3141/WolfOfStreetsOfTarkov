@@ -49,10 +49,7 @@ class MarketBot(QThread):
 
     @Slot(bool)
     def price_changed(self, price):
-        try:
-            self.price = int(price)
-        except:
-            self.price = 0
+        self.price = price
 
     def run(self):
         with mss.mss() as sct:

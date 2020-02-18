@@ -53,12 +53,6 @@ class MarketBotMainWindow(QMainWindow):
         self.update_buy_state()
 
         def listing_cb(listings):
-            limit = self.main.buy_limit.getValue() - 1
-            if limit == 0:
-                self.buying = False
-                self.update_buy_state()
-            self.main.buy_limit.setValue(limit)
-
             # TODO graph this
             pass
             # self.text.setText(
@@ -70,6 +64,13 @@ class MarketBotMainWindow(QMainWindow):
         self.successful_buys = []
 
         def buy_cb(listing):
+            if self.main.limit_enabled.isChecked():
+                limit = self.main.buy_limit.value() - 1
+                if limit == 0:
+                    self.buying = False
+                    self.update_buy_state()
+                self.main.buy_limit.setValue(limit)
+
             self.successful_buys.append(listing)
             num_buys = len(self.successful_buys)
             self.main.total_label.setText("Bought: {}".format(num_buys))
@@ -80,13 +81,15 @@ class MarketBotMainWindow(QMainWindow):
             self.successful_buys = []
         self.main.reset_stats.clicked.connect(reset_buys)
 
+        self.main.buy_button.clicked.connect(self.toggle_buying)
+
         self.marketbot.start()
 
     def update_buy_state(self):
         self.buying_signal.emit(self.buying)
         if self.buying:
             print("Buying active")
-            self.buy_button.setText("Du not baj (Ctrl + Alt + B)")
+            self.main.buy_button.setText("Du not baj (Ctrl + Alt + B)")
         else:
             print("Buying not active")
             self.main.buy_button.setText("Dubaj (Ctrl + Alt + B)")
