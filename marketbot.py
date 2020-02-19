@@ -6,7 +6,7 @@ from timeit import default_timer
 
 import mss
 import pyautogui
-from PySide2.QtCore import QThread, Signal, Slot
+from PyQt5.QtCore import *
 
 from buyer import evaluate_listing
 from constants import LINE_HEIGHT
@@ -25,10 +25,11 @@ class State(Enum):
     WAIT_FOR_BUY_RESULT = 3
 
 
+# noinspection PyArgumentList
 class MarketBot(QThread):
-    listings_signal = Signal(object)
-    successful_buy_signal = Signal(object)
-    fault_signal = Signal(object)  # TODO (eg. Item move error)
+    listings_signal = pyqtSignal(object)
+    successful_buy_signal = pyqtSignal(object)
+    fault_signal = pyqtSignal(object)  # TODO (eg. Item move error)
 
     def __init__(self, parentQWidget=None):
         super(MarketBot, self).__init__(parentQWidget)
@@ -43,11 +44,11 @@ class MarketBot(QThread):
         self.last_buy_number = None
         self.unavailable_listings = None
 
-    @Slot(bool)
+    @pyqtSlot(bool)
     def buying_changed(self, buying):
         self.buying = buying
 
-    @Slot(bool)
+    @pyqtSlot(int)
     def price_changed(self, price):
         self.price = price
 

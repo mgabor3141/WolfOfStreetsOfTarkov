@@ -35,14 +35,14 @@ class ScreenWatcher:
 
         self.price_patterns = {}
         for i in range(0, 10):
-            self.price_patterns[i] = cv2.imread(r'patterns/{}.png'.format(i), 0)
+            self.price_patterns[i] = cv2.imread(r'patterns/{}.png'.format(i), cv2.IMREAD_GRAYSCALE)
 
         for c in {'rub', 'eur', 'usd', 'perpack'}:
-            self.price_patterns[c] = cv2.imread(r'patterns/{}.png'.format(c), 0)
+            self.price_patterns[c] = cv2.imread(r'patterns/{}.png'.format(c), cv2.IMREAD_GRAYSCALE)
 
-        self.purchase_pattern = cv2.imread(r'patterns/purchase.png'.format(c), 0)
-        self.outofstock_pattern = cv2.imread(r'patterns/outofstock.png'.format(c), 0)
-        self.ok_pattern = cv2.imread(r'patterns/ok.png'.format(c), 0)
+        self.purchase_pattern = cv2.imread(r'patterns/purchase.png', cv2.IMREAD_GRAYSCALE)
+        self.outofstock_pattern = cv2.imread(r'patterns/outofstock.png', cv2.IMREAD_GRAYSCALE)
+        self.ok_pattern = cv2.imread(r'patterns/ok.png', cv2.IMREAD_GRAYSCALE)
 
     def find_listings(self):
         PRICE_REGION = {'top': 146, 'left': 1239, 'width': 205, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}
@@ -68,13 +68,11 @@ class ScreenWatcher:
                     if self.debug:
                         cv2.putText(img, str(pattern), pt, cv2.FONT_HERSHEY_SIMPLEX, 1, (64, 128, 64))
 
-        listings = {y: Listing(y * LINE_HEIGHT + line_offset, l) for y, l in sorted(raw_listings.items())}
-
         if self.debug:
             cv2.imshow("Prices", img)
             cv2.waitKey(1)
 
-        return list(listings.values())
+        return [Listing(y * LINE_HEIGHT + line_offset, l) for y, l in sorted(raw_listings.items())]
 
     def find_purchase_buttons(self):
         BUTTON_REGION = {'top': 146, 'left': 1695, 'width': 120, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}

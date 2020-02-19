@@ -1,13 +1,14 @@
 import random
 import sys
 from ctypes import windll, create_unicode_buffer
+from timeit import default_timer
 
 import pyautogui
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import *
+from PyQt5 import uic
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from pyqtkeybind import keybinder
+import pyqtgraph as pg
 
 from marketbot import MarketBot
 
@@ -31,19 +32,20 @@ def refresh_interval():
 
 
 class MarketBotMainWindow(QMainWindow):
-    buying_signal = Signal(bool)
+    buying_signal = pyqtSignal(bool)
 
     def __init__(self, *args):
         super(MarketBotMainWindow, self).__init__(*args)
         self.setWindowTitle('WolfOfStreetsOfTarkov')
-        self.setGeometry(100, 750, 290, 170)
+        self.setGeometry(100, 600, 600, 500)
 
-        file = QFile("main.ui")
-        file.open(QFile.ReadOnly)
-        self.main = QUiLoader().load(file, self)
-        file.close()
-
+        self.main = uic.loadUi("main.ui")
         self.setCentralWidget(self.main)
+
+        self.prices_scatter = pg.ScatterPlotItem(pen='w', symbol='o', size=1)
+        self.bought_prices_scatter = pg.ScatterPlotItem(pen='r', symbol='o', size=1)
+        self.main.chart.addItem(self.prices_scatter)
+        self.main.chart.addItem(self.bought_prices_scatter)
 
         self.marketbot = MarketBot(self)
         self.buying_signal.connect(self.marketbot.buying_changed)
@@ -53,11 +55,7 @@ class MarketBotMainWindow(QMainWindow):
         self.update_buy_state()
 
         def listing_cb(listings):
-            # TODO graph this
-            pass
-            # self.text.setText(
-            #     '\n'.join(["{} ({:.0f})".format(str(l), l.rub_value() if l.rub_value() is not None else -1)
-            #                for l in listings]))
+            self.prices_scatter.addPoints([default_timer()], [listings[0].rub_value()])
 
         self.marketbot.listings_signal.connect(listing_cb)
 
@@ -71,6 +69,7 @@ class MarketBotMainWindow(QMainWindow):
                     self.update_buy_state()
                 self.main.buy_limit.setValue(limit)
 
+            self.bought_prices_scatter.addPoints([default_timer()], [listing.rub_value()])
             self.successful_buys.append(listing)
             num_buys = len(self.successful_buys)
             self.main.total_label.setText("Bought: {}".format(num_buys))
@@ -79,6 +78,8 @@ class MarketBotMainWindow(QMainWindow):
 
         def reset_buys():
             self.successful_buys = []
+            self.prices_scatter.clear()
+            self.bought_prices_scatter.clear()
         self.main.reset_stats.clicked.connect(reset_buys)
 
         self.main.buy_button.clicked.connect(self.toggle_buying)
@@ -89,10 +90,10 @@ class MarketBotMainWindow(QMainWindow):
         self.buying_signal.emit(self.buying)
         if self.buying:
             print("Buying active")
-            self.main.buy_button.setText("Du not baj (Ctrl + Alt + B)")
+            self.main.buy_button.setText("Stop buying (Ctrl + Alt + B)")
         else:
             print("Buying not active")
-            self.main.buy_button.setText("Dubaj (Ctrl + Alt + B)")
+            self.main.buy_button.setText("Start buying (Ctrl + Alt + B)")
 
     def toggle_buying(self):
         self.buying = not self.buying
