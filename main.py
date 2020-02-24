@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import *
 from pyqtkeybind import keybinder
 import pyqtgraph as pg
 
+from resource_path import resource_path
 from marketbot import MarketBot
 
 
@@ -18,7 +19,7 @@ class MarketBotMainWindow(QMainWindow):
         self.setWindowTitle('WolfOfStreetsOfTarkov')
         self.setGeometry(15, 560, 600, 500)
 
-        self.main = uic.loadUi("main.ui")
+        self.main = uic.loadUi(resource_path("main.ui"))
         self.setCentralWidget(self.main)
 
         self.prices_scatter = pg.ScatterPlotItem(pen='w', symbol='o', size=1)

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+from resource_path import resource_path
 from constants import LINE_HEIGHT
 from listing import *
 
@@ -35,14 +36,14 @@ class ScreenWatcher:
 
         self.price_patterns = {}
         for i in range(0, 10):
-            self.price_patterns[i] = cv2.imread(r'patterns/{}.png'.format(i), cv2.IMREAD_GRAYSCALE)
+            self.price_patterns[i] = cv2.imread(resource_path(f'patterns/{i}.png'), cv2.IMREAD_GRAYSCALE)
 
         for c in {'rub', 'eur', 'usd', 'perpack'}:
-            self.price_patterns[c] = cv2.imread(r'patterns/{}.png'.format(c), cv2.IMREAD_GRAYSCALE)
+            self.price_patterns[c] = cv2.imread(resource_path(f'patterns/{c}.png'), cv2.IMREAD_GRAYSCALE)
 
-        self.purchase_pattern = cv2.imread(r'patterns/purchase.png', cv2.IMREAD_GRAYSCALE)
-        self.outofstock_pattern = cv2.imread(r'patterns/outofstock.png', cv2.IMREAD_GRAYSCALE)
-        self.ok_pattern = cv2.imread(r'patterns/ok.png', cv2.IMREAD_GRAYSCALE)
+        self.purchase_pattern = cv2.imread(resource_path('patterns/purchase.png'), cv2.IMREAD_GRAYSCALE)
+        self.outofstock_pattern = cv2.imread(resource_path('patterns/outofstock.png'), cv2.IMREAD_GRAYSCALE)
+        self.ok_pattern = cv2.imread(resource_path('patterns/ok.png'), cv2.IMREAD_GRAYSCALE)
 
     def find_listings(self):
         PRICE_REGION = {'top': 146, 'left': 1239, 'width': 205, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}
@@ -65,12 +66,6 @@ class ScreenWatcher:
                 raw_listings.setdefault(y, {})
                 if all([abs(x - cx) > 5 for cx, val in raw_listings[y].items() if val == pattern]):
                     raw_listings[y][x] = pattern
-                    if self.debug:
-                        cv2.putText(img, str(pattern), pt, cv2.FONT_HERSHEY_SIMPLEX, 1, (64, 128, 64))
-
-        if self.debug:
-            cv2.imshow("Prices", img)
-            cv2.waitKey(1)
 
         return [Listing(y * LINE_HEIGHT + line_offset, l) for y, l in sorted(raw_listings.items())]
 
