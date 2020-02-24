@@ -44,11 +44,7 @@ class Listing:
         if not self.valid:
             return None
 
-        val = self.value
-        if self.currency == 'usd':
-            val *= 109  # 57 as far as sorting is concerned
-        elif self.currency == 'eur':
-            val *= 119
+        val = self.total_value()
 
         if self.perpack:
             if val % 2 == 0:
@@ -59,6 +55,15 @@ class Listing:
                 val //= 5
             else:
                 val /= 7
+
+        return val
+
+    def total_value(self):
+        val = self.value
+        if self.currency == 'usd':
+            val *= 109  # 57 as far as sorting is concerned
+        elif self.currency == 'eur':
+            val *= 119
 
         return val
 

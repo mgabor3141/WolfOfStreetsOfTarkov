@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>609</width>
-    <height>495</height>
+    <height>593</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,109 +21,173 @@
   </property>
   <layout class="QVBoxLayout" name="main_layout">
    <item>
-    <widget class="QPushButton" name="buy_button">
-     <property name="text">
-      <string>BUY</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="target_price_label">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="target_price_label">
+           <property name="text">
+            <string>Target Price:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="target_price">
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="maximum">
+            <number>10000000</number>
+           </property>
+           <property name="singleStep">
+            <number>1000</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="rub">
+           <property name="text">
+            <string>RUB</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="usd">
+           <property name="text">
+            <string>USD</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="eur">
+           <property name="text">
+            <string>EUR</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QCheckBox" name="buy_limit_enabled">
+           <property name="text">
+            <string>Limit number of buys:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="buy_limit">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QCheckBox" name="spend_limit_enabled">
+           <property name="text">
+            <string>Limit money spent:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spend_limit">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="maximum">
+            <number>999999999</number>
+           </property>
+           <property name="singleStep">
+            <number>1000</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="buy_button">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Target Price:</string>
+        <string>BUY</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QSpinBox" name="target_price">
-       <property name="maximum">
-        <number>10000000</number>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="reset_stats">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="singleStep">
-        <number>1000</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="rub">
        <property name="text">
-        <string>RUB</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>Clear</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QCheckBox" name="usd">
-       <property name="text">
-        <string>USD</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="eur">
-       <property name="text">
-        <string>EUR</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="limit_enabled">
-       <property name="text">
-        <string>Limit:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="buy_limit">
-       <property name="minimum">
-        <number>0</number>
-       </property>
-       <property name="maximum">
-        <number>999999999</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4"/>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
+     <item row="2" column="0">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="total_label">
-         <property name="text">
-          <string>Bought:</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="total_label">
+           <property name="text">
+            <string>Bought:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="spent_label">
+           <property name="text">
+            <string>Spent:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QLabel" name="avg_label">
@@ -133,19 +197,6 @@
         </widget>
        </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="reset_stats">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Reset</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -162,5 +213,38 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>buy_limit_enabled</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>buy_limit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>146</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>205</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spend_limit_enabled</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spend_limit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>90</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>226</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

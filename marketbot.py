@@ -16,6 +16,7 @@ pyautogui.PAUSE = 0.1
 pyautogui.FAILSAFE = False
 
 PURCHASE_OFFSET = 1730, 185
+TRADING_BUTTON = 960, 800
 
 
 class State(Enum):
@@ -72,6 +73,11 @@ class MarketBot(QThread):
 
                 elif self.next_refresh + 10 < default_timer():
                     print("Stuck failsafe triggered")
+                    error = self.screenwatcher.find_error_ok_button()
+                    if error:
+                        pyautogui.click(error)
+                    pyautogui.click(TRADING_BUTTON)
+                    sleep(1)
                     self.state = State.WAIT_FOR_REFRESH
 
                 elif self.state is State.WAIT_FOR_LISTINGS:
