@@ -47,7 +47,7 @@ class ScreenWatcher:
 
     def find_listings(self):
         PRICE_REGION = {'top': 146, 'left': 1239, 'width': 205, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}
-        img = cv2.cvtColor(np.array(self.sct.grab(PRICE_REGION)), cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(self.sct.grab(PRICE_REGION), cv2.COLOR_BGR2GRAY)
 
         raw_listings = {}
         line_offset = None
@@ -71,7 +71,7 @@ class ScreenWatcher:
 
     def find_purchase_buttons(self):
         BUTTON_REGION = {'top': 146, 'left': 1695, 'width': 120, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}
-        img = cv2.cvtColor(np.array(self.sct.grab(BUTTON_REGION)), cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(self.sct.grab(BUTTON_REGION), cv2.COLOR_BGR2GRAY)
 
         button_numbers = set()
         line_offset = None
@@ -94,7 +94,7 @@ class ScreenWatcher:
         button_numbers = self.find_purchase_buttons()
 
         BUTTON_REGION = {'top': 146, 'left': 1695, 'width': 120, 'height': LINE_HEIGHT * LISTINGS_TO_PROCESS}
-        img = cv2.cvtColor(np.array(self.sct.grab(BUTTON_REGION)), cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(self.sct.grab(BUTTON_REGION), cv2.COLOR_BGR2GRAY)
 
         line_offset = None
 
@@ -114,7 +114,7 @@ class ScreenWatcher:
 
     def find_error_ok_button(self):
         OK_REGION = {'top': 549, 'left': 927, 'width': 67, 'height': 120}
-        img = cv2.cvtColor(np.array(self.sct.grab(OK_REGION)), cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(self.sct.grab(OK_REGION), cv2.COLOR_BGR2GRAY)
 
         res = cv2.matchTemplate(img, self.ok_pattern, cv2.TM_CCOEFF_NORMED)
         loc = np.where(res >= MATCH_THRESHOLDS['ok'])

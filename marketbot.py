@@ -8,6 +8,7 @@ import pyautogui
 from PyQt5.QtCore import *
 
 from buyer import evaluate_listing
+from screenshotter import ScreenShotter
 from screenwatcher import ScreenWatcher
 from windowtitle import get_foreground_window_title
 
@@ -53,7 +54,7 @@ class MarketBot(QThread):
         self.price = price
 
     def run(self):
-        with mss.mss() as sct:
+        with ScreenShotter() as sct:
             self.screenwatcher = ScreenWatcher(sct)
 
             while True:
