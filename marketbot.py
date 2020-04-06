@@ -1,4 +1,3 @@
-from ctypes import windll, create_unicode_buffer
 from enum import Enum
 from random import random
 from time import sleep
@@ -9,8 +8,8 @@ import pyautogui
 from PyQt5.QtCore import *
 
 from buyer import evaluate_listing
-from constants import LINE_HEIGHT
 from screenwatcher import ScreenWatcher
+from windowtitle import get_foreground_window_title
 
 pyautogui.PAUSE = 0.1
 pyautogui.FAILSAFE = False
@@ -30,7 +29,7 @@ class State(Enum):
 class MarketBot(QThread):
     listings_signal = pyqtSignal(object)
     successful_buy_signal = pyqtSignal(object)
-    fault_signal = pyqtSignal(object)  # TODO (eg. Item move error)
+    # fault_signal = pyqtSignal(object)  # TODO (eg. Item move error)
 
     def __init__(self, parentQWidget=None):
         super(MarketBot, self).__init__(parentQWidget)
@@ -130,12 +129,3 @@ class MarketBot(QThread):
         pyautogui.click(x=PURCHASE_OFFSET[0], y=PURCHASE_OFFSET[1] + listing.coord)
         pyautogui.press('y')
         pyautogui.moveTo(x=PURCHASE_OFFSET[0], y=120)
-
-
-def get_foreground_window_title():
-    hWnd = windll.user32.GetForegroundWindow()
-    length = windll.user32.GetWindowTextLengthW(hWnd)
-    buf = create_unicode_buffer(length + 1)
-    windll.user32.GetWindowTextW(hWnd, buf, length + 1)
-
-    return buf.value if buf.value else None
