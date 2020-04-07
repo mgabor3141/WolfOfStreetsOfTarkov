@@ -16,7 +16,7 @@ pyautogui.PAUSE = 0.1
 pyautogui.FAILSAFE = False
 
 PURCHASE_OFFSET = 1730, 185
-TRADING_BUTTON = 960, 800
+TRADING_BUTTON = 1268, 1065
 
 
 class State(Enum):
